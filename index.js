@@ -30,11 +30,25 @@ async function run() {
         const toysCollection = client.db('ToysDB').collection('toys')
 
         app.get('/teddys', async (req, res) => {
+            // console.log(req.query?.CategoryName);
+            // console.log(req.query?.sellerMail);
             let query = {}
             if (req.query?.CategoryName) {
                 query = { CategoryName: req.query.CategoryName }
             }
+            // else if(req.query?.sellerMail){
+            //     query: {sellerMail : req.query?.sellerMail}
+            // }
             const result = await toysCollection.find(query).toArray()
+            res.send(result)
+        })
+        
+        app.get('/teddys/:email', async (req, res) => {
+            const email = req.params.email
+
+            console.log(email);
+
+            const result = await toysCollection.find({sellerMail: req.params.email}).toArray()
             res.send(result)
         })
 
