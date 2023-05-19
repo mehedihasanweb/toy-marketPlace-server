@@ -29,6 +29,27 @@ async function run() {
 
         const toysCollection = client.db('ToysDB').collection('toys')
 
+        const indexKeys = { name: 1, SubCategoryName: 1 }
+        const indexOption = { name: "nameSubCategoryName" }
+        const result = await toysCollection.createIndex(indexKeys, indexOption)
+        console.log(result);
+
+
+        app.get("/getJobsByText/:text", async (req, res) => {
+            const text = req.params.text;
+            const result = await toysCollection
+                .find({
+                    $or: [
+                        { name: { $regex: text, $options: "i" } },
+                        { SubCategoryName: { $regex: text, $options: "i" } },
+                    ],
+                })
+                .toArray();
+            res.send(result);
+        });
+
+
+
         app.get('/teddys', async (req, res) => {
             console.log(req.query.CategoryName);
             let query = {}
