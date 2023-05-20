@@ -29,55 +29,50 @@ async function run() {
 
         const toysCollection = client.db('ToysDB').collection('toys')
 
-        const indexKeys = { name: 1, SubCategoryName: 1 }
-        const indexOption = { name: "nameSubCategoryName" }
-        const result = await toysCollection.createIndex(indexKeys, indexOption)
-        console.log(result);
+        const latestCollection = client.db('ToysDB').collection('myToys')
 
-
-        app.get("/getJobsByText/:text", async (req, res) => {
-            const text = req.params.text;
-            const result = await toysCollection
-                .find({
-                    $or: [
-                        { name: { $regex: text, $options: "i" } },
-                        { SubCategoryName: { $regex: text, $options: "i" } },
-                    ],
-                })
-                .toArray();
-            res.send(result);
-        });
-
-
-
-        app.get('/teddys', async (req, res) => {
-            console.log(req.query.CategoryName);
-            let query = {}
-            if (req.query?.CategoryName) {
-                query = { CategoryName: req.query.CategoryName }
-            }
-            const result = await toysCollection.find(query).toArray()
+        app.get('/latest', async (req, res) => {
+            const result = await latestCollection.find().toArray()
             res.send(result)
         })
+
 
         app.get('/teddys', async (req, res) => {
             const result = await toysCollection.find().toArray()
             res.send(result)
         })
 
-        app.get('/teddys/:email', async (req, res) => {
-            const email = req.params.email
-            console.log(email);
-            const result = await toysCollection.find({ sellerMail: req.params.email }).toArray()
-            res.send(result)
-        })
-
-
         app.get('/teddys/:id', async (req, res) => {
             const id = req.params.id
             console.log(id);
             const filter = { _id: new ObjectId(id) }
             const result = await toysCollection.findOne(filter)
+            res.send(result)
+        })
+
+
+        app.get('/bookings', async (req, res) => {
+            // console.log(req.query.sellerMail);
+
+            let query = {}
+            if (req.query?.sellerMail) {
+                query = { sellerMail: req.query.sellerMail }
+            }
+
+            const result = await toysCollection.find(query).toArray()
+            res.send(result)
+        })
+
+
+        app.get('/tabs', async (req, res) => {
+            console.log(req.query.CategoryName);
+
+            let query = {}
+            if (req.query?.CategoryName) {
+                query = { CategoryName: req.query.CategoryName }
+            }
+
+            const result = await toysCollection.find(query).toArray()
             res.send(result)
         })
 
@@ -104,12 +99,12 @@ async function run() {
             res.send(result)
         })
 
-        app.delete('/teddys/:id', async (req, res) => {
-            const id = req.params.id
-            const query = { _id: new ObjectId(id) }
-            const result = await toysCollection.deleteOne(query)
-            res.send(result)
-        })
+        // app.delete('/teddys/:id', async (req, res) => {
+        //     const id = req.params.id
+        //     const query = { _id: new ObjectId(id) }
+        //     const result = await toysCollection.deleteOne(query)
+        //     res.send(result)
+        // })
 
         // Send a ping to confirm a successful connection
         await client.db("admin").command({ ping: 1 });
