@@ -31,6 +31,13 @@ async function run() {
 
         const latestCollection = client.db('ToysDB').collection('myToys')
 
+
+
+        
+
+
+
+
         app.get('/latest', async (req, res) => {
             const result = await latestCollection.find().toArray()
             res.send(result)
@@ -52,14 +59,15 @@ async function run() {
 
 
         app.get('/bookings', async (req, res) => {
-            // console.log(req.query.sellerMail);
+            console.log(req.query.Price);
 
             let query = {}
             if (req.query?.sellerMail) {
                 query = { sellerMail: req.query.sellerMail }
             }
+            const sort = req?.query?.sort === 'true' ? 1 : -1
 
-            const result = await toysCollection.find(query).toArray()
+            const result = await toysCollection.find(query).sort({Price: sort}).toArray()
             res.send(result)
         })
 
@@ -99,12 +107,12 @@ async function run() {
             res.send(result)
         })
 
-        // app.delete('/teddys/:id', async (req, res) => {
-        //     const id = req.params.id
-        //     const query = { _id: new ObjectId(id) }
-        //     const result = await toysCollection.deleteOne(query)
-        //     res.send(result)
-        // })
+        app.delete('/teddys/:id', async (req, res) => {
+            const id = req.params.id
+            const query = { _id: new ObjectId(id) }
+            const result = await toysCollection.deleteOne(query)
+            res.send(result)
+        })
 
         // Send a ping to confirm a successful connection
         await client.db("admin").command({ ping: 1 });
