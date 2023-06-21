@@ -68,7 +68,7 @@ async function run() {
             if (req.query?.sellerMail) {
                 query = { sellerMail: req.query.sellerMail }
             }
-            const sort = req?.query?.sort === 'true' ? 1 : -1
+            const sort = req?.query?.sort === 'asc' ? 1 : -1
 
             const result = await toysCollection.find(query).sort({Price: sort}).toArray()
             res.send(result)
